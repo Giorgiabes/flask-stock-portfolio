@@ -47,13 +47,9 @@ def register_default_user(test_client):
     # Register the default user
     test_client.post(
         "/users/register",
-        data={
-            "email": "abesadze.george@gmail.com",
-            "password": "testpass123",
-        },
+        data={"email": "abesadze.george@gmail.com", "password": "testpass123"},
         follow_redirects=True,
     )
-    return
 
 
 @pytest.fixture(scope="function")
@@ -61,10 +57,7 @@ def log_in_default_user(test_client, register_default_user):
     # Log in the default user
     test_client.post(
         "/users/login",
-        data={
-            "email": "abesadze.george@gmail.com",
-            "password": "testpass123",
-        },
+        data={"email": "abesadze.george@gmail.com", "password": "testpass123"},
         follow_redirects=True,
     )
 
