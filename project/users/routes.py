@@ -9,7 +9,13 @@ from flask import (
     url_for,
     copy_current_request_context,
 )
-from .forms import RegistrationForm, LoginForm, EmailForm, PasswordForm
+from .forms import (
+    RegistrationForm,
+    LoginForm,
+    EmailForm,
+    PasswordForm,
+    ChangePasswordForm,
+)
 from project.models import User
 from project import database, mail
 from sqlalchemy.exc import IntegrityError
@@ -282,8 +288,24 @@ def process_password_reset_token(token):
 
 
 @users_blueprint.route("/change_password", methods=["GET", "POST"])
+@login_required
 def change_password():
-    return "<h1>Page Is Under Construction</h1>"
+    form = ChangePasswordForm()
+
+    if form.validate_on_submit():
+        if current_user.is_password_correct(form.current_password.data):
+            current_user.set_password(form.new_password.data)
+            database.session.add(current_user)
+            database.session.commit()
+            flash("Password has been updated!", "success")
+            current_app.logger.info(f"Password updated for user: {current_user.email}")
+            return redirect(url_for("users.user_profile"))
+        else:
+            flash("ERROR! Incorrect user credentials!")
+            current_app.logger.info(
+                f"Incorrect password change for user: {current_user.email}"
+            )
+    return render_template("users/change_password.html", form=form)
 
 
 @users_blueprint.route("/resend_email_confirmation")

@@ -96,3 +96,13 @@ def afterwards_reset_default_user_password():
     user.set_password("testpass123")
     database.session.add(user)
     database.session.commit()
+
+
+@pytest.fixture(scope="function")
+def unconfirm_email_default_user(test_client, log_in_default_user):
+    """Clear the email confirmed status of the default user."""
+    user = User.query.filter_by(email="abesadze.george@gmail.com").first()
+    user.email_confirmed = False
+    user.email_confirmed_on = None
+    database.session.add(user)
+    database.session.commit()
